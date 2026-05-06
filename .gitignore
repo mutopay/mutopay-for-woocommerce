@@ -1,0 +1,27 @@
+# Build artifacts
+*.zip
+build/
+dist/
+
+# Dependencies
+node_modules/
+vendor/
+composer.lock
+package-lock.json
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# PHP
+*.log
+.phpunit.result.cache
+
+# Local config
+.env
+.env.local
+*.local

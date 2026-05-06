@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build plugin zip
+        run: |
+          mkdir -p /tmp/build/mutopay-for-woocommerce
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.gitignore' \
+            --exclude='node_modules' \
+            --exclude='vendor' \
+            --exclude='tests' \
+            --exclude='*.zip' \
+            --exclude='.DS_Store' \
+            --exclude='README.md' \
+            ./ /tmp/build/mutopay-for-woocommerce/
+          cd /tmp/build && zip -r "${GITHUB_WORKSPACE}/mutopay-for-woocommerce.zip" mutopay-for-woocommerce
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: mutopay-for-woocommerce.zip
+          generate_release_notes: true
+          draft: false
+          prerelease: false
