@@ -19,6 +19,64 @@ class MutoPay_Order_Meta {
 	public static function register() {
 		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_box' ) );
 		add_action( 'wp_ajax_mutopay_recheck_status', array( __CLASS__, 'ajax_recheck_status' ) );
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_admin_assets' ) );
+	}
+
+	/**
+	 * Enqueue the recheck-status script on order edit screens for MutoPay orders.
+	 */
+	public static function enqueue_admin_assets() {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen ) {
+			return;
+		}
+
+		$order_screen = self::get_order_screen();
+		if ( ! $order_screen || $screen->id !== $order_screen ) {
+			return;
+		}
+
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		$order_id = 0;
+		if ( isset( $_GET['post'] ) ) {
+			$order_id = absint( wp_unslash( $_GET['post'] ) );
+		} elseif ( isset( $_GET['id'] ) ) {
+			$order_id = absint( wp_unslash( $_GET['id'] ) );
+		}
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+		if ( ! $order_id ) {
+			return;
+		}
+
+		$order = wc_get_order( $order_id );
+		if ( ! $order || $order->get_payment_method() !== 'mutopay' || ! $order->has_status( 'on-hold' ) ) {
+			return;
+		}
+
+		wp_enqueue_script(
+			'mutopay-admin-order-meta',
+			plugin_dir_url( MUTOPAY_WC_PLUGIN_FILE ) . 'assets/admin/order-meta.js',
+			array(),
+			MUTOPAY_WC_VERSION,
+			true
+		);
+
+		wp_localize_script(
+			'mutopay-admin-order-meta',
+			'mutopayOrderMeta',
+			array(
+				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+				'orderId' => $order_id,
+				'nonce'   => wp_create_nonce( 'mutopay_recheck_' . $order_id ),
+				'i18n'    => array(
+					'checking'      => __( 'Checking...', 'mutopay-for-woocommerce' ),
+					'checkFailed'   => __( 'Check failed.', 'mutopay-for-woocommerce' ),
+					'recheck'       => __( 'Re-check payment status', 'mutopay-for-woocommerce' ),
+					'requestFailed' => __( 'Request failed.', 'mutopay-for-woocommerce' ),
+				),
+			)
+		);
 	}
 
 	/**
@@ -108,40 +166,6 @@ class MutoPay_Order_Meta {
 						<?php esc_html_e( 'Re-check payment status', 'mutopay-for-woocommerce' ); ?>
 					</button>
 					<span id="mutopay-recheck-result" style="display:block;margin-top:6px;font-size:12px;"></span>
-					<script type="text/javascript">
-						document.getElementById('mutopay-recheck-status').addEventListener('click', function() {
-							var btn = this;
-							var result = document.getElementById('mutopay-recheck-result');
-							btn.disabled = true;
-							btn.textContent = '<?php echo esc_js( __( 'Checking...', 'mutopay-for-woocommerce' ) ); ?>';
-							result.textContent = '';
-							result.style.color = '';
-							fetch(ajaxurl, {
-								method: 'POST',
-								headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-								body: 'action=mutopay_recheck_status&order_id=<?php echo esc_js( $order->get_id() ); ?>&nonce=<?php echo esc_js( wp_create_nonce( 'mutopay_recheck_' . $order->get_id() ) ); ?>'
-							})
-							.then(function(r) { return r.json(); })
-							.then(function(data) {
-								if (data.success) {
-									result.style.color = '#46b450';
-									result.textContent = data.data.message;
-									if (data.data.changed) { location.reload(); }
-								} else {
-									result.style.color = '#a00';
-									result.textContent = data.data.message || '<?php echo esc_js( __( 'Check failed.', 'mutopay-for-woocommerce' ) ); ?>';
-								}
-								btn.disabled = false;
-								btn.textContent = '<?php echo esc_js( __( 'Re-check payment status', 'mutopay-for-woocommerce' ) ); ?>';
-							})
-							.catch(function() {
-								result.style.color = '#a00';
-								result.textContent = '<?php echo esc_js( __( 'Request failed.', 'mutopay-for-woocommerce' ) ); ?>';
-								btn.disabled = false;
-								btn.textContent = '<?php echo esc_js( __( 'Re-check payment status', 'mutopay-for-woocommerce' ) ); ?>';
-							});
-						});
-					</script>
 				</div>
 			<?php endif; ?>
 		</div>

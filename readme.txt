@@ -7,11 +7,11 @@ Requires PHP: 8.0
 Requires Plugins: woocommerce
 WC requires at least: 8.0
 WC tested up to: 9.5
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Accept crypto payments in your WooCommerce store via MutoPay. Customers pay with any token on 7+ chains — you receive stablecoins.
+Accept crypto payments in your WooCommerce store via MutoPay. Customers pay with any token on 7+ chains, you receive stablecoins.
 
 == Description ==
 
@@ -85,6 +85,9 @@ The webhook URL must be publicly accessible for MutoPay to deliver payment notif
 5. WooCommerce order with MutoPay payment details and transaction hash
 
 == Changelog ==
+
+= 1.0.1 =
+* Moved inline admin scripts into enqueued JS files for WordPress.org guideline compliance.
 
 = 1.0.0 =
 * Initial release

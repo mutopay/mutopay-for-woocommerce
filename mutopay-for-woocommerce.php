@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: MutoPay for WooCommerce
- * Description: Accept crypto payments via MutoPay. Customers pay with any token on 7+ chains — you receive stablecoins.
- * Version: 1.0.0
+ * Description: Accept crypto payments via MutoPay. Customers pay with any token on 7+ chains, you receive stablecoins.
+ * Version: 1.0.1
  * Author: MutoPay
  * Author URI: https://mutopay.com
  * License: GPLv2 or later
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'MUTOPAY_WC_VERSION', '1.0.0' );
+define( 'MUTOPAY_WC_VERSION', '1.0.1' );
 define( 'MUTOPAY_WC_PLUGIN_FILE', __FILE__ );
 
 /**
@@ -81,6 +81,9 @@ add_action(
 
 		// Register webhook REST route.
 		add_action( 'rest_api_init', array( 'MutoPay_Webhook', 'register_routes' ) );
+
+		// Enqueue admin assets for gateway settings screen.
+		add_action( 'admin_enqueue_scripts', array( 'MutoPay_Gateway', 'enqueue_admin_assets' ) );
 
 		// Register cron handler.
 		add_action( 'mutopay_poll_pending_payments', array( 'MutoPay_Cron', 'run' ) );

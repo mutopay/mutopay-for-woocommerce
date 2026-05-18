@@ -32,6 +32,46 @@ class MutoPay_Gateway extends WC_Payment_Gateway {
 	}
 
 	/**
+	 * Enqueue admin assets on the MutoPay gateway settings screen.
+	 *
+	 * @param string $hook Current admin page hook.
+	 */
+	public static function enqueue_admin_assets( $hook ) {
+		if ( 'woocommerce_page_wc-settings' !== $hook ) {
+			return;
+		}
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		$tab     = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : '';
+		$section = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash( $_GET['section'] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+		if ( 'checkout' !== $tab || 'mutopay' !== $section ) {
+			return;
+		}
+
+		wp_enqueue_script(
+			'mutopay-admin-settings',
+			plugin_dir_url( MUTOPAY_WC_PLUGIN_FILE ) . 'assets/admin/settings.js',
+			array(),
+			MUTOPAY_WC_VERSION,
+			true
+		);
+
+		wp_localize_script(
+			'mutopay-admin-settings',
+			'mutopayAdminSettings',
+			array(
+				'ajaxUrl'         => admin_url( 'admin-ajax.php' ),
+				'advancedTitle'   => __( 'Advanced Settings', 'mutopay-for-woocommerce' ),
+				'disconnectNonce' => wp_create_nonce( 'mutopay_disconnect' ),
+				'i18n'            => array(
+					'disconnectConfirm' => __( 'Disconnect from MutoPay? You will need to reconnect to accept payments.', 'mutopay-for-woocommerce' ),
+					'disconnecting'     => __( 'Disconnecting...', 'mutopay-for-woocommerce' ),
+				),
+			)
+		);
+	}
+
+	/**
 	 * Define gateway settings fields.
 	 */
 	public function init_form_fields() {
@@ -196,25 +236,6 @@ class MutoPay_Gateway extends WC_Payment_Gateway {
 				</a>
 			</th>
 		</tr>
-		<script type="text/javascript">
-			(function() {
-				document.addEventListener('DOMContentLoaded', function() {
-					var toggle = document.getElementById('mutopay-advanced-toggle');
-					var rows = document.querySelectorAll('.mutopay-advanced-field');
-					rows.forEach(function(input) {
-						input.closest('tr').style.display = 'none';
-					});
-					toggle.addEventListener('click', function(e) {
-						e.preventDefault();
-						var hidden = rows[0] && rows[0].closest('tr').style.display === 'none';
-						rows.forEach(function(input) {
-							input.closest('tr').style.display = hidden ? '' : 'none';
-						});
-						toggle.textContent = (hidden ? '▼ ' : '▶ ') + <?php echo wp_json_encode( $data['title'] ); ?>;
-					});
-				});
-			})();
-		</script>
 		<?php
 		return ob_get_clean();
 	}
@@ -289,19 +310,6 @@ class MutoPay_Gateway extends WC_Payment_Gateway {
 					<button type="button" class="button" id="mutopay-disconnect" style="color:#a00;">
 						<?php esc_html_e( 'Disconnect', 'mutopay-for-woocommerce' ); ?>
 					</button>
-					<script type="text/javascript">
-						document.getElementById('mutopay-disconnect').addEventListener('click', function() {
-							if (!confirm('<?php echo esc_js( __( 'Disconnect from MutoPay? You will need to reconnect to accept payments.', 'mutopay-for-woocommerce' ) ); ?>')) return;
-							var btn = this;
-							btn.disabled = true;
-							btn.textContent = '<?php echo esc_js( __( 'Disconnecting...', 'mutopay-for-woocommerce' ) ); ?>';
-							fetch(ajaxurl, {
-								method: 'POST',
-								headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-								body: 'action=mutopay_disconnect&nonce=<?php echo esc_js( wp_create_nonce( 'mutopay_disconnect' ) ); ?>'
-							}).then(function() { location.reload(); });
-						});
-					</script>
 				<?php else : ?>
 					<a href="<?php echo esc_url( $connect_url ); ?>" class="button button-primary">
 						<?php esc_html_e( 'Connect to MutoPay', 'mutopay-for-woocommerce' ); ?>
@@ -309,62 +317,6 @@ class MutoPay_Gateway extends WC_Payment_Gateway {
 					<p class="description"><?php echo esc_html( $data['description'] ); ?></p>
 				<?php endif; ?>
 				</fieldset>
-			</td>
-		</tr>
-		<?php
-		return ob_get_clean();
-	}
-
-	/**
-	 * Render the webhook URL field as a read-only input with a copy button.
-	 *
-	 * @param string $key  Field key.
-	 * @param array  $data Field data.
-	 * @return string HTML.
-	 */
-	public function generate_webhook_url_html( $key, $data ) {
-		$field_key   = $this->get_field_key( $key );
-		$webhook_url = rest_url( 'mutopay/v1/webhook' );
-		$defaults    = array( 'title' => '', 'description' => '' );
-		$data        = wp_parse_args( $data, $defaults );
-
-		ob_start();
-		?>
-		<tr valign="top">
-			<th scope="row" class="titledesc">
-				<label><?php echo esc_html( $data['title'] ); ?></label>
-			</th>
-			<td class="forminp">
-				<fieldset>
-					<div style="display:flex;gap:8px;align-items:center;max-width:400px;">
-						<input type="text"
-							id="<?php echo esc_attr( $field_key ); ?>"
-							value="<?php echo esc_attr( $webhook_url ); ?>"
-							readonly="readonly"
-							class="input-text regular-input"
-							style="flex:1;background:#f0f0f1;cursor:default;"
-							onclick="this.select();" />
-						<button type="button"
-							class="button"
-							id="<?php echo esc_attr( $field_key ); ?>-copy"
-							title="<?php esc_attr_e( 'Copy to clipboard', 'mutopay-for-woocommerce' ); ?>">
-							<?php esc_html_e( 'Copy', 'mutopay-for-woocommerce' ); ?>
-						</button>
-					</div>
-					<p class="description"><?php echo esc_html( $data['description'] ); ?></p>
-				</fieldset>
-				<script type="text/javascript">
-					document.getElementById('<?php echo esc_js( $field_key ); ?>-copy')
-						.addEventListener('click', function() {
-							var input = document.getElementById('<?php echo esc_js( $field_key ); ?>');
-							navigator.clipboard.writeText(input.value).then(function() {
-								var btn = document.getElementById('<?php echo esc_js( $field_key ); ?>-copy');
-								var orig = btn.textContent;
-								btn.textContent = '<?php echo esc_js( __( 'Copied!', 'mutopay-for-woocommerce' ) ); ?>';
-								setTimeout(function() { btn.textContent = orig; }, 2000);
-							});
-						});
-				</script>
 			</td>
 		</tr>
 		<?php
