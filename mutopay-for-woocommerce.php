@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MutoPay for WooCommerce
  * Description: Accept crypto payments via MutoPay. Customers pay with any token on 7+ chains, you receive stablecoins.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: MutoPay
  * Author URI: https://mutopay.com
  * License: GPLv2 or later
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'MUTOPAY_WC_VERSION', '1.0.1' );
+define( 'MUTOPAY_WC_VERSION', '1.0.2' );
 define( 'MUTOPAY_WC_PLUGIN_FILE', __FILE__ );
 
 /**

@@ -254,8 +254,17 @@ class MutoPay_Gateway extends WC_Payment_Gateway {
 		$connected_email = $this->get_option( 'connected_email' );
 		$is_connected    = ! empty( $connected_email ) && ! empty( $this->get_option( 'api_key' ) );
 
-		$base_url    = rtrim( $this->get_option( 'base_url', 'https://mutopay.com' ), '/' );
-		$return_url  = admin_url( 'admin.php?page=mutopay-connect' );
+		$base_url = rtrim( $this->get_option( 'base_url', 'https://mutopay.com' ), '/' );
+
+		// CSRF defense for the OAuth callback: generate a one-time state token
+		// bound to the current admin, echo it through return_url, verify on return.
+		$state = wp_generate_password( 32, false );
+		set_transient( 'mutopay_connect_state_' . get_current_user_id(), $state, 15 * MINUTE_IN_SECONDS );
+
+		$return_url  = add_query_arg(
+			array( 'state' => $state ),
+			admin_url( 'admin.php?page=mutopay-connect' )
+		);
 		$webhook_url = rest_url( 'mutopay/v1/webhook' );
 		$site_name   = wp_parse_url( home_url(), PHP_URL_HOST );
 

@@ -7,7 +7,7 @@ Requires PHP: 8.0
 Requires Plugins: woocommerce
 WC requires at least: 8.0
 WC tested up to: 9.5
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,6 +85,9 @@ The webhook URL must be publicly accessible for MutoPay to deliver payment notif
 5. WooCommerce order with MutoPay payment details and transaction hash
 
 == Changelog ==
+
+= 1.0.2 =
+* Security: added a one-time state parameter to the MutoPay connect (OAuth) callback to defend against CSRF, plus an explicit capability check on the callback handler.
 
 = 1.0.1 =
 * Moved inline admin scripts into enqueued JS files for WordPress.org guideline compliance.

@@ -38,7 +38,32 @@ class MutoPay_Connect {
 	 * Handle the OAuth callback — exchange token for credentials.
 	 */
 	public static function handle_callback() {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- OAuth callback from external service, nonce not applicable.
+		// Only WooCommerce admins may complete the connect flow. The hidden
+		// submenu is already capability-restricted, this is defense in depth.
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_die(
+				esc_html__( 'You do not have permission to connect this store to MutoPay.', 'mutopay-for-woocommerce' ),
+				esc_html__( 'Connection Failed', 'mutopay-for-woocommerce' ),
+				array( 'response' => 403 )
+			);
+		}
+
+		// CSRF check: the state parameter is generated when the admin clicks
+		// "Connect to MutoPay", stored in a per-user transient, and echoed back
+		// here via return_url. A mismatch means the callback was not initiated
+		// by this admin (forged link, replayed callback, etc.) and is rejected.
+		$received_state = isset( $_GET['state'] ) ? sanitize_text_field( wp_unslash( $_GET['state'] ) ) : '';
+		$expected_state = get_transient( 'mutopay_connect_state_' . get_current_user_id() );
+		delete_transient( 'mutopay_connect_state_' . get_current_user_id() );
+
+		if ( empty( $received_state ) || empty( $expected_state ) || ! hash_equals( (string) $expected_state, $received_state ) ) {
+			wp_die(
+				esc_html__( 'Invalid or expired connect request. Please start the connection again from the MutoPay settings page.', 'mutopay-for-woocommerce' ),
+				esc_html__( 'Connection Failed', 'mutopay-for-woocommerce' ),
+				array( 'response' => 403, 'back_link' => true )
+			);
+		}
+
 		$token = isset( $_GET['token'] ) ? sanitize_text_field( wp_unslash( $_GET['token'] ) ) : '';
 
 		if ( empty( $token ) ) {
