@@ -52,6 +52,7 @@ class MutoPay_Connect {
 		// "Connect to MutoPay", stored in a per-user transient, and echoed back
 		// here via return_url. A mismatch means the callback was not initiated
 		// by this admin (forged link, replayed callback, etc.) and is rejected.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- OAuth callback arrives as an external redirect; CSRF is enforced by the `state` token verified below, not a WP nonce.
 		$received_state = isset( $_GET['state'] ) ? sanitize_text_field( wp_unslash( $_GET['state'] ) ) : '';
 		$expected_state = get_transient( 'mutopay_connect_state_' . get_current_user_id() );
 		delete_transient( 'mutopay_connect_state_' . get_current_user_id() );
@@ -64,6 +65,7 @@ class MutoPay_Connect {
 			);
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Same OAuth callback; request authenticity is already established by the `state` check above.
 		$token = isset( $_GET['token'] ) ? sanitize_text_field( wp_unslash( $_GET['token'] ) ) : '';
 
 		if ( empty( $token ) ) {

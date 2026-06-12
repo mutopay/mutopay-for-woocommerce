@@ -31,6 +31,7 @@ class MutoPay_Cron {
 		$orders = wc_get_orders(
 			array(
 				'status'     => 'on-hold',
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Bounded cron query (on-hold status, last 7 days, limit 50); meta lookup is required to find MutoPay orders.
 				'meta_key'   => '_mutopay_payment_id',
 				'date_after' => gmdate( 'Y-m-d', strtotime( '-7 days' ) ),
 				'limit'      => 50,

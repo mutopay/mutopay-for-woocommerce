@@ -2,12 +2,12 @@
 Contributors: mutopay
 Tags: crypto, payments, woocommerce, stablecoin, blockchain
 Requires at least: 6.0
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 8.0
 Requires Plugins: woocommerce
 WC requires at least: 8.0
 WC tested up to: 9.5
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,6 +85,9 @@ The webhook URL must be publicly accessible for MutoPay to deliver payment notif
 5. WooCommerce order with MutoPay payment details and transaction hash
 
 == Changelog ==
+
+= 1.0.3 =
+* Annotated Plugin Check warnings: the connect (OAuth) callback uses a state token rather than a nonce for CSRF, and the cron poller's order meta query is intentionally bounded.
 
 = 1.0.2 =
 * Security: added a one-time state parameter to the MutoPay connect (OAuth) callback to defend against CSRF, plus an explicit capability check on the callback handler.
