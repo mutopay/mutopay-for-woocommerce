@@ -7,7 +7,7 @@ Requires PHP: 8.0
 Requires Plugins: woocommerce
 WC requires at least: 8.0
 WC tested up to: 9.5
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,6 +85,9 @@ The webhook URL must be publicly accessible for MutoPay to deliver payment notif
 5. WooCommerce order with MutoPay payment details and transaction hash
 
 == Changelog ==
+
+= 1.0.4 =
+* Removed "Powered by MutoPay" attribution from the default checkout description shown to customers. Per WordPress.org guidelines, credit links must not appear on user-facing interfaces without explicit admin opt-in. Merchants can still add any description they choose in the gateway settings.
 
 = 1.0.3 =
 * Annotated Plugin Check warnings: the connect (OAuth) callback uses a state token rather than a nonce for CSRF, and the cron poller's order meta query is intentionally bounded.

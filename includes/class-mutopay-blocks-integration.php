@@ -52,7 +52,7 @@ class MutoPay_Blocks_Integration extends AbstractPaymentMethodType {
 	public function get_payment_method_data() {
 		return array(
 			'title'       => $this->settings['title'] ?? 'Pay with Crypto',
-			'description' => $this->settings['description'] ?? 'Pay with any token on 7+ chains. Powered by MutoPay.',
+			'description' => $this->settings['description'] ?? 'Pay with any token on 7+ chains.',
 			'icon'        => plugin_dir_url( MUTOPAY_WC_PLUGIN_FILE ) . 'assets/mutopay-icon.svg',
 			'supports'    => array( 'products' ),
 		);

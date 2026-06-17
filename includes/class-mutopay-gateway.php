@@ -93,7 +93,7 @@ class MutoPay_Gateway extends WC_Payment_Gateway {
 				'title'       => __( 'Description', 'mutopay-for-woocommerce' ),
 				'type'        => 'textarea',
 				'description' => __( 'Description shown at checkout.', 'mutopay-for-woocommerce' ),
-				'default'     => __( 'Pay with any token on 7+ chains. Powered by MutoPay.', 'mutopay-for-woocommerce' ),
+				'default'     => __( 'Pay with any token on 7+ chains.', 'mutopay-for-woocommerce' ),
 				'desc_tip'    => true,
 			),
 			'connect_button' => array(
