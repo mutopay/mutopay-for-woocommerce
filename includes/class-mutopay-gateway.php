@@ -202,7 +202,7 @@ class MutoPay_Gateway extends WC_Payment_Gateway {
 	}
 
 	/**
-	 * Handle refund — crypto refunds must be done manually.
+	 * Handle refund. Crypto refunds must be done manually.
 	 *
 	 * @param int        $order_id Order ID.
 	 * @param float|null $amount   Refund amount.
@@ -426,7 +426,7 @@ class MutoPay_Gateway extends WC_Payment_Gateway {
 		$status = $client->check_setup_status();
 
 		if ( is_wp_error( $status ) ) {
-			// API unreachable — allow enabling but warn.
+			// API unreachable, allow enabling but warn.
 			WC_Admin_Settings::add_error(
 				__( 'MutoPay: Could not verify setup status. Ensure your wallet address is configured in the MutoPay dashboard.', 'mutopay-for-woocommerce' )
 			);

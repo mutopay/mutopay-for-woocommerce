@@ -1,6 +1,6 @@
 <?php
 /**
- * MutoPay Connect — handles OAuth-style connect flow.
+ * MutoPay Connect: handles OAuth-style connect flow.
  *
  * @package MutoPay_WooCommerce
  */
@@ -35,7 +35,7 @@ class MutoPay_Connect {
 	}
 
 	/**
-	 * Handle the OAuth callback — exchange token for credentials.
+	 * Handle the OAuth callback: exchange token for credentials.
 	 */
 	public static function handle_callback() {
 		// Only WooCommerce admins may complete the connect flow. The hidden

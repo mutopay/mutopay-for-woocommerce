@@ -87,7 +87,7 @@ class MutoPay_API_Client {
 		$raw_body    = wp_remote_retrieve_body( $response );
 		$decoded     = json_decode( $raw_body, true );
 
-		$this->log( "Response: {$status_code} — " . substr( $raw_body, 0, 500 ) );
+		$this->log( "Response: {$status_code} - " . substr( $raw_body, 0, 500 ) );
 
 		if ( $status_code < 200 || $status_code >= 300 ) {
 			$message = $decoded['error'] ?? $decoded['message'] ?? "API error (HTTP {$status_code})";

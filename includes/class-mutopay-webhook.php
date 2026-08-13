@@ -99,7 +99,7 @@ class MutoPay_Webhook {
 
 				// Reopen cancelled orders that received payment.
 				if ( $current_status === 'cancelled' ) {
-					$order->update_status( 'processing', __( 'Payment received after cancellation — order reopened.', 'mutopay-for-woocommerce' ) );
+					$order->update_status( 'processing', __( 'Payment received after cancellation, order reopened.', 'mutopay-for-woocommerce' ) );
 				} else {
 					$order->payment_complete( $tx_hash );
 				}
@@ -126,7 +126,7 @@ class MutoPay_Webhook {
 				break;
 
 			case 'payment.underpaid':
-				$order->update_status( 'on-hold', __( 'Crypto payment underpaid — manual review needed', 'mutopay-for-woocommerce' ) );
+				$order->update_status( 'on-hold', __( 'Crypto payment underpaid, manual review needed', 'mutopay-for-woocommerce' ) );
 				self::log( "Order #{$order_id} set on-hold (underpaid)" );
 				break;
 

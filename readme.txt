@@ -2,12 +2,12 @@
 Contributors: mutopay
 Tags: crypto, payments, woocommerce, stablecoin, blockchain
 Requires at least: 6.0
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 8.0
 Requires Plugins: woocommerce
 WC requires at least: 8.0
 WC tested up to: 9.5
-Stable tag: 1.0.4
+Stable tag: 1.0.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -29,7 +29,7 @@ MutoPay for WooCommerce lets your customers pay with any cryptocurrency token ac
 
 **Features:**
 
-* No frontend JS — uses MutoPay's hosted payment page
+* No frontend JS: uses MutoPay's hosted payment page
 * Automatic order status updates via webhooks
 * WP-Cron fallback polling for reliability
 * HMAC-SHA256 webhook signature verification
@@ -80,11 +80,14 @@ The webhook URL must be publicly accessible for MutoPay to deliver payment notif
 
 1. "Pay with Crypto" option at WooCommerce checkout
 2. Plugin settings with one-click MutoPay connection
-3. Hosted payment page — select payment token across 7+ chains
+3. Hosted payment page: select payment token across 7+ chains
 4. Payment summary with route details before confirming
 5. WooCommerce order with MutoPay payment details and transaction hash
 
 == Changelog ==
+
+= 1.0.5 =
+* Tested against WordPress 7.1. No code changes were needed: the plugin uses no jQuery, no block editor scripts, and none of the components affected by the 7.1 editor and media changes.
 
 = 1.0.4 =
 * Removed "Powered by MutoPay" attribution from the default checkout description shown to customers. Per WordPress.org guidelines, credit links must not appear on user-facing interfaces without explicit admin opt-in. Merchants can still add any description they choose in the gateway settings.

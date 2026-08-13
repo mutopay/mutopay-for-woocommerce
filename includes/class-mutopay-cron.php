@@ -57,7 +57,7 @@ class MutoPay_Cron {
 			}
 
 			$status = $response['status'] ?? '';
-			self::log( sprintf( 'Order #%d — MutoPay status: %s', $order->get_id(), $status ) );
+			self::log( sprintf( 'Order #%d, MutoPay status: %s', $order->get_id(), $status ) );
 			self::process_status( $order, $status, $response );
 		}
 	}
@@ -117,14 +117,14 @@ class MutoPay_Cron {
 					'on-hold',
 					sprintf(
 						/* translators: %s: note suffix */
-						__( 'Crypto payment underpaid — manual review needed. %s', 'mutopay-for-woocommerce' ),
+						__( 'Crypto payment underpaid, manual review needed. %s', 'mutopay-for-woocommerce' ),
 						$note_suffix
 					)
 				);
 				break;
 
 			default:
-				// Still pending/processing — no action needed.
+				// Still pending/processing, no action needed.
 				break;
 		}
 	}
